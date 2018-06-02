@@ -174,49 +174,59 @@ public class Piece {
 		return moves;
 	}
 
-	public void addThreats(int x, int y, Board board, Set<Coordinate> coordinates) {
+	public void addThreats(int x, int y, Board board, boolean white) {
 		switch (type) {
 		case BISHOP:
-			addBishopThreats(x, y, board, coordinates);
+			addBishopThreats(x, y, board, white);
 			break;
 		case KING:
-			coordinates.add(new Coordinate(x + 1, y));
-			coordinates.add(new Coordinate(x + 1, y + 1));
-			coordinates.add(new Coordinate(x + 1, y - 1));
-			coordinates.add(new Coordinate(x - 1, y));
-			coordinates.add(new Coordinate(x - 1, y + 1));
-			coordinates.add(new Coordinate(x - 1, y - 1));
-			coordinates.add(new Coordinate(x, y - 1));
-			coordinates.add(new Coordinate(x, y + 1));
+			addThreatToArray(x + 1, y, board, white);
+			addThreatToArray(x + 1, y + 1, board, white);
+			addThreatToArray(x + 1, y - 1,  board, white);
+			addThreatToArray(x - 1, y, board, white);
+			addThreatToArray(x - 1, y + 1, board, white);
+			addThreatToArray(x - 1, y - 1, board, white);
+			addThreatToArray(x, y - 1, board, white);
+			addThreatToArray(x, y + 1, board, white);
 			break;
 		case KNIGHT:
-			coordinates.add(new Coordinate(x + 1, y + 2));
-			coordinates.add(new Coordinate(x + 1, y - 2));
-			coordinates.add(new Coordinate(x - 1, y + 2));
-			coordinates.add(new Coordinate(x - 1, y - 2));
-			coordinates.add(new Coordinate(x + 2, y + 1));
-			coordinates.add(new Coordinate(x + 2, y - 1));
-			coordinates.add(new Coordinate(x - 2, y + 1));
-			coordinates.add(new Coordinate(x - 2, y - 1));
+			addThreatToArray(x + 1, y + 2, board, white);
+			addThreatToArray(x + 1, y - 2, board, white);
+			addThreatToArray(x - 1, y + 2, board, white);
+			addThreatToArray(x - 1, y - 2, board, white);
+			
+			addThreatToArray(x + 2, y + 1, board, white);
+			addThreatToArray(x + 2, y - 1, board, white);
+			addThreatToArray(x - 2, y + 1, board, white);
+			addThreatToArray(x - 2, y - 1, board, white);
+			
 			break;
 		case PAWN:
 			int direction = color == PieceColor.WHITE ? 1 : -1;
-			coordinates.add(new Coordinate(x + direction, y - 1));
-			coordinates.add(new Coordinate(x + direction, y + 1));
+			addThreatToArray(x + direction, y - 1, board, white);
+			addThreatToArray(x + direction, y + 1, board, white);
 			break;
 		case QUEEN:
-			addBishopThreats(x, y, board, coordinates);
-			addRookThreats(x, y, board, coordinates);
+			addBishopThreats(x, y, board, white);
+			addRookThreats(x, y, board, white);
 			break;
 		case ROOK:
-			addRookThreats(x, y, board, coordinates);
+			addRookThreats(x, y, board, white);
 			break;
 		default:
 			break;
 		}
 	}
 
-	private Board createMove(int origX, int origY, int x, int y, Board board) {
+	private void addThreatToArray(int x, int y, Board board, boolean white) {
+		if (x > -1 && x < 8 && y > -1 && y < 8)
+			if (white)
+				board.whiteThreats[x][y]++;
+			else
+				board.blackThreats[x][y]++;
+	}
+
+	public Board createMove(int origX, int origY, int x, int y, Board board) {
 		return createMove(origX, origY, x, y, board, -1, -1, null);
 	}
 
@@ -247,7 +257,7 @@ public class Piece {
 		{
 			Board promotionMove = new Board(board);
 			promotionMove.setLastMoved(this);
-			promotionMove.getPieces()[color == PieceColor.WHITE ? 6 : 1][y] = null;
+			promotionMove.getPieces()[remX][remY] = null;
 			Piece piece = new Piece(color, PieceType.BISHOP);
 			promotionMove.getPieces()[x][y] = piece;
 			promotionMoves.add(createMove(-1, -1, -1, -1, board, -1, -1, promotionMove));
@@ -256,7 +266,7 @@ public class Piece {
 		{
 			Board promotionMove = new Board(board);
 			promotionMove.setLastMoved(this);
-			promotionMove.getPieces()[color == PieceColor.WHITE ? 6 : 1][y] = null;
+			promotionMove.getPieces()[remX][remY] = null;
 			Piece piece = new Piece(color, PieceType.KNIGHT);
 			promotionMove.getPieces()[x][y] = piece;
 			promotionMoves.add(createMove(-1, -1, -1, -1, board, -1, -1, promotionMove));
@@ -265,7 +275,7 @@ public class Piece {
 		{
 			Board promotionMove = new Board(board);
 			promotionMove.setLastMoved(this);
-			promotionMove.getPieces()[color == PieceColor.WHITE ? 6 : 1][y] = null;
+			promotionMove.getPieces()[remX][remY] = null;
 			Piece piece = new Piece(color, PieceType.ROOK);
 			promotionMove.getPieces()[x][y] = piece;
 			promotionMoves.add(createMove(-1, -1, -1, -1, board, -1, -1, promotionMove));
@@ -274,7 +284,7 @@ public class Piece {
 		{
 			Board promotionMove = new Board(board);
 			promotionMove.setLastMoved(this);
-			promotionMove.getPieces()[color == PieceColor.WHITE ? 6 : 1][y] = null;
+			promotionMove.getPieces()[remX][remY] = null;
 			Piece piece = new Piece(color, PieceType.QUEEN);
 			promotionMove.getPieces()[x][y] = piece;
 			promotionMoves.add(createMove(-1, -1, -1, -1, board, -1, -1, promotionMove));
@@ -383,13 +393,16 @@ public class Piece {
 		}
 	}
 
-	private void addBishopThreats(int x, int y, Board board, Set<Coordinate> coordinates) {
+	private void addBishopThreats(int x, int y, Board board, boolean white) {
 		{
 			int xt = x, yt = y;
 			boolean collision = false;
 			while (!collision && ++xt > -1 && xt < 8 && ++yt > -1 && yt < 8) {
 				collision |= board.getPieces()[xt][yt] != null;
-				coordinates.add(new Coordinate(xt, yt));
+				if (white)
+					board.whiteThreats[xt][yt]++;
+				else
+					board.blackThreats[xt][yt]++;
 			}
 		}
 		{
@@ -397,7 +410,10 @@ public class Piece {
 			boolean collision = false;
 			while (!collision && ++xt > -1 && xt < 8 && --yt > -1 && yt < 8) {
 				collision |= board.getPieces()[xt][yt] != null;
-				coordinates.add(new Coordinate(xt, yt));
+				if (white)
+					board.whiteThreats[xt][yt]++;
+				else
+					board.blackThreats[xt][yt]++;
 			}
 		}
 		{
@@ -405,7 +421,10 @@ public class Piece {
 			boolean collision = false;
 			while (!collision && --xt > -1 && xt < 8 && ++yt > -1 && yt < 8) {
 				collision |= board.getPieces()[xt][yt] != null;
-				coordinates.add(new Coordinate(xt, yt));
+				if (white)
+					board.whiteThreats[xt][yt]++;
+				else
+					board.blackThreats[xt][yt]++;
 			}
 		}
 		{
@@ -413,7 +432,10 @@ public class Piece {
 			boolean collision = false;
 			while (!collision && --xt > -1 && xt < 8 && --yt > -1 && yt < 8) {
 				collision |= board.getPieces()[xt][yt] != null;
-				coordinates.add(new Coordinate(xt, yt));
+				if (white)
+					board.whiteThreats[xt][yt]++;
+				else
+					board.blackThreats[xt][yt]++;
 			}
 		}
 	}
@@ -453,13 +475,16 @@ public class Piece {
 		}
 	}
 
-	private void addRookThreats(int x, int y, Board board, Set<Coordinate> coordinates) {
+	private void addRookThreats(int x, int y, Board board, boolean white) {
 		{
 			int xt = x, yt = y;
 			boolean collision = false;
 			while (!collision && ++xt > -1 && xt < 8 && yt > -1 && yt < 8) {
 				collision |= board.getPieces()[xt][yt] != null;
-				coordinates.add(new Coordinate(xt, yt));
+				if (white)
+					board.whiteThreats[xt][yt]++;
+				else
+					board.blackThreats[xt][yt]++;
 			}
 		}
 		{
@@ -467,7 +492,10 @@ public class Piece {
 			boolean collision = false;
 			while (!collision && --xt > -1 && xt < 8 && yt > -1 && yt < 8) {
 				collision |= board.getPieces()[xt][yt] != null;
-				coordinates.add(new Coordinate(xt, yt));
+				if (white)
+					board.whiteThreats[xt][yt]++;
+				else
+					board.blackThreats[xt][yt]++;
 			}
 		}
 		{
@@ -475,7 +503,10 @@ public class Piece {
 			boolean collision = false;
 			while (!collision && xt > -1 && xt < 8 && ++yt > -1 && yt < 8) {
 				collision |= board.getPieces()[xt][yt] != null;
-				coordinates.add(new Coordinate(xt, yt));
+				if (white)
+					board.whiteThreats[xt][yt]++;
+				else
+					board.blackThreats[xt][yt]++;
 			}
 		}
 		{
@@ -483,7 +514,10 @@ public class Piece {
 			boolean collision = false;
 			while (!collision && xt > -1 && xt < 8 && --yt > -1 && yt < 8) {
 				collision |= board.getPieces()[xt][yt] != null;
-				coordinates.add(new Coordinate(xt, yt));
+				if (white)
+					board.whiteThreats[xt][yt]++;
+				else
+					board.blackThreats[xt][yt]++;
 			}
 		}
 	}

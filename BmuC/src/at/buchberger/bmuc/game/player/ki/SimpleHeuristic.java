@@ -10,6 +10,12 @@ public class SimpleHeuristic implements Heuristic<Board> {
 
 	private PieceColor activeColor;
 
+	private boolean onlyEvalPieces;
+
+	public SimpleHeuristic(boolean onlyEvalPieces) {
+		this.onlyEvalPieces = onlyEvalPieces;
+	}
+
 	@Override
 	public void setInitialState(Board state) {
 		activeColor = state.getActivePlayerColor();
@@ -22,12 +28,15 @@ public class SimpleHeuristic implements Heuristic<Board> {
 		if (gameState.getFinalBoardState() == FinalBoardState.STALEMATE)
 			return 0;
 		if (gameState.getFinalBoardState() == FinalBoardState.REPETITION)
-			return 0;
+			return -999999;
 
-		if (gameState.getFinalBoardState() == FinalBoardState.CHESSMATE)
-			return (searchDepth + 1) * 100000; // the sooner mate, the better
+		if (gameState.getFinalBoardState() == FinalBoardState.CHESSMATE) // the sooner mate, the better
+			return (gameState.getActivePlayerColor() == activeColor ? -1 : 1) * (searchDepth + 1) * 100000;
 
 		int eval = evalPieces(gameState) * 10;
+
+		if (onlyEvalPieces)
+			return eval;
 
 		// return eval;
 		if (activeColor == PieceColor.WHITE)

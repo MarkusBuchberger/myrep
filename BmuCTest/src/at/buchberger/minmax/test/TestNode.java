@@ -21,8 +21,14 @@ public class TestNode extends GameState<TestNode> {
 	}
 
 	@Override
-	public Collection<TestNode> getFollowingStates(int max) {
-		return children.size() > max ? children.subList(0, max - 1) : children;
+	public Collection<TestNode> getFollowingStates() {
+		return children;
+	}
+
+	
+	@Override
+	public Collection<TestNode> getFollowingStates(boolean onlyCheckExists) {
+		return children;
 	}
 
 	@Override

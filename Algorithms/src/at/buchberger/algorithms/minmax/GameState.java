@@ -4,24 +4,18 @@ import java.util.Collection;
 
 public abstract class GameState<T> {
 	
-	private int evaluation;
 	private int minMax;
 	private Collection<T> children;
 	
 	
 	public abstract void internalEvaluation();
 	
-	public abstract Collection<T> getFollowingStates(int max);
+	public abstract Collection<T> getFollowingStates();
+	
+	public abstract Collection<T> getFollowingStates(boolean onlyCheckExists);
 	
 	public abstract boolean isFinalMove();
 
-	public int getEvaluation() {
-		return evaluation;
-	}
-
-	public void setEvaluation(int evaluation) {
-		this.evaluation = evaluation;
-	}
 
 	public Collection<T> getChildren() {
 		return children;

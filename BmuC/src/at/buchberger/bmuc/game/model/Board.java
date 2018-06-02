@@ -18,9 +18,9 @@ public class Board extends GameState<Board> {
 	private Board lastBoard;
 	private Piece lastMoved;
 
-	private final int[][] whiteThreats;
+	public final int[][] whiteThreats;
 
-	private final int[][] blackThreats;
+	public final int[][] blackThreats;
 
 	private boolean rochadeWhiteLeftViable = true;
 	private boolean rochadeWhiteRightViable = true;
@@ -34,7 +34,7 @@ public class Board extends GameState<Board> {
 	private int finalHashCode;
 
 	private Collection<Board> tempFollowingStates = null;
-	
+
 	public Board() {
 		pieces = new Piece[8][];
 		for (int i = 0; i < 8; i++)
@@ -63,28 +63,23 @@ public class Board extends GameState<Board> {
 	}
 
 	public void calculateThreats() {
-		Set<Coordinate> whiteThreatsSet = new HashSet<Coordinate>();
-		Set<Coordinate> blackThreatsSet = new HashSet<Coordinate>();
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				if (pieces[i][j] != null) {
 					if (pieces[i][j].getColor() == PieceColor.WHITE)
-						pieces[i][j].addThreats(i, j, this, whiteThreatsSet);
+						pieces[i][j].addThreats(i, j, this, true);
 					else
-						pieces[i][j].addThreats(i, j, this, blackThreatsSet);
+						pieces[i][j].addThreats(i, j, this, false);
 				}
 			}
 		}
-		for (Coordinate threat : whiteThreatsSet)
-			if (threat.getX() > -1 && threat.getX() < 8 && threat.getY() > -1 && threat.getY() < 8)
-				whiteThreats[threat.getX()][threat.getY()]++;
-
-		for (Coordinate threat : blackThreatsSet)
-			if (threat.getX() > -1 && threat.getX() < 8 && threat.getY() > -1 && threat.getY() < 8)
-				blackThreats[threat.getX()][threat.getY()]++;
 	}
 
-	public Collection<Board> getMoves(PieceColor color, int max) {
+	public Collection<Board> getMoves(PieceColor color) {
+		return getMoves(color, false);
+	}
+
+	public Collection<Board> getMoves(PieceColor color, boolean onlyCheckExists) {
 		List<Board> moves = new ArrayList<Board>();
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -92,15 +87,15 @@ public class Board extends GameState<Board> {
 				if (piece != null && (color == null || piece.getColor() == color)) {
 					moves.addAll(piece.getMoves(i, j, this));
 				}
-				if (moves.size() >= max)
+				if (onlyCheckExists && moves.size() > 0)
 					return moves;
 			}
 		}
-
-		// for(Board move: moves) {
-		// move.printBoardToConsole();
-		// move.printThreatsToConsole();
-		// }
+		if (!onlyCheckExists) {
+			for (Board move : moves) {
+				move.internalEvaluation();
+			}
+		}
 		return moves;
 	}
 
@@ -109,13 +104,13 @@ public class Board extends GameState<Board> {
 		printThreatsToConsole();
 
 		System.out.println("\nWhite moves:");
-		for (Board move : getMoves(PieceColor.WHITE, Integer.MAX_VALUE)) {
+		for (Board move : getMoves(PieceColor.WHITE)) {
 			move.printBoardToConsole();
 			move.printThreatsToConsole();
 		}
 
 		System.out.println("\nBlack moves:");
-		for (Board move : getMoves(PieceColor.BLACK, Integer.MAX_VALUE)) {
+		for (Board move : getMoves(PieceColor.BLACK)) {
 			move.printBoardToConsole();
 			move.printThreatsToConsole();
 		}
@@ -231,13 +226,19 @@ public class Board extends GameState<Board> {
 		return blackThreats;
 	}
 
+	public boolean existsFollowingState() {
+		return !getFollowingStates(true).isEmpty();
+	}
 
+	public Collection<Board> getFollowingStates() {
+		return getFollowingStates(false);
+	}
 
-	public Collection<Board> getFollowingStates(int max) {
+	public Collection<Board> getFollowingStates(boolean onlyCheckExists) {
 		if (tempFollowingStates != null)
 			return tempFollowingStates;
-		Collection<Board> states = new HashSet<Board>(getMoves(getActivePlayerColor(), max));
-		if (max > 100)
+		Collection<Board> states = new HashSet<Board>(getMoves(getActivePlayerColor(), onlyCheckExists));
+		if (!onlyCheckExists)
 			tempFollowingStates = states;
 		return states;
 	}
@@ -275,7 +276,7 @@ public class Board extends GameState<Board> {
 
 	@Override
 	public void internalEvaluation() {
-		if (getFollowingStates(1).isEmpty()) {
+		if (getFollowingStates(true).isEmpty()) {
 			if (isKingThreated(getActivePlayerColor()))
 				finalBoardState = FinalBoardState.CHESSMATE;
 			else
@@ -301,7 +302,10 @@ public class Board extends GameState<Board> {
 	public boolean equals(Object arg0) {
 		if (arg0 instanceof Board) {
 			Board b2 = (Board) arg0;
-			if (rochadeBlackLeftViable && rochadeBlackRightViable && rochadeWhiteLeftViable && rochadeWhiteRightViable
+			if (rochadeBlackLeftViable == b2.rochadeBlackLeftViable
+					&& rochadeBlackRightViable == b2.rochadeBlackRightViable
+					&& rochadeWhiteLeftViable == b2.rochadeWhiteLeftViable
+					&& rochadeWhiteRightViable == b2.rochadeWhiteRightViable
 					&& enPassantVulnerable == b2.enPassantVulnerable) {
 				boolean piecesEqual = true;
 				for (int i = 0; i < 8; i++)
@@ -341,7 +345,7 @@ public class Board extends GameState<Board> {
 		super.truncatePaths();
 		tempFollowingStates = null;
 	}
-	
+
 	@Override
 	public boolean isFinalMove() {
 		return finalBoardState != null;

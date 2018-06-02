@@ -1,6 +1,6 @@
 package at.buchberger.bmuc.game.controller;
 
-import java.text.NumberFormat;
+import java.util.Calendar;
 
 import at.buchberger.bmuc.game.model.Board;
 import at.buchberger.bmuc.game.player.Player;
@@ -10,7 +10,7 @@ import at.buchberger.bmuc.model.piece.PieceType;
 
 public class BmucController {
 
-	public static void playGame(Player player1, Player player2) {
+	public static double playGame(Player player1, Player player2) {
 		Board currentState = new Board();
 		initStartingPositions(currentState);
 
@@ -18,23 +18,10 @@ public class BmucController {
 
 		int turn = 1;
 
-		while (currentState.getFinalBoardState() == null && !currentState.getFollowingStates(1).isEmpty()) {
+		while (currentState.getFinalBoardState() == null && !currentState.getFollowingStates(true).isEmpty()) {
 			System.out.println("\n turn " + turn + " " + (activePlayer == player1 ? "White:" : "Black"));
 
-			Runtime runtime = Runtime.getRuntime();
-
-			NumberFormat format = NumberFormat.getInstance();
-
-			StringBuilder sb = new StringBuilder();
-
-			long allocatedMemory = runtime.totalMemory();
-			System.out.println();
-			sb.append("allocated memory: " + format.format(allocatedMemory / 1024) + "\n");
-
-			System.out.println(sb.toString());
-			System.gc();
-
-
+			Calendar start = Calendar.getInstance();
 			Board nextMove = activePlayer.choseMove(currentState);
 			currentState.truncatePaths();
 			currentState = nextMove;
@@ -43,9 +30,22 @@ public class BmucController {
 			activePlayer = activePlayer == player1 ? player2 : player1;
 			if (activePlayer == player1)
 				turn++;
+			System.out.println("elapsed time: "+(Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis()) + " ms");
 
 		}
 		System.out.println(currentState.getFinalBoardState());
+
+		double result = 0;
+
+		switch (currentState.getFinalBoardState()) {
+		case CHESSMATE:
+			result = activePlayer == player1 ? -1 : 1;
+		default:
+			break;
+		}
+		System.out.println(result);
+
+		return result;
 
 	}
 
@@ -88,16 +88,13 @@ public class BmucController {
 			board.getPieces()[6][7] = new Piece(PieceColor.BLACK, PieceType.PAWN);
 		}
 		// {
-		// board.getPieces()[0][0] = new Piece(PieceColor.WHITE,
-		// PieceType.ROOK);
-		// //board.getPieces()[0][7] = new Piece(PieceColor.WHITE,
-		// PieceType.QUEEN);
-		// board.getPieces()[0][3] = new Piece(PieceColor.WHITE,
-		// PieceType.KING);
-		// board.getPieces()[7][4] = new Piece(PieceColor.BLACK,
-		// PieceType.KING);
+		// board.getPieces()[0][0] = new Piece(PieceColor.WHITE, PieceType.ROOK);
+		// // board.getPieces()[0][7] = new Piece(PieceColor.WHITE,
+		// // PieceType.QUEEN);
+		// board.getPieces()[3][6] = new Piece(PieceColor.WHITE, PieceType.KING);
+		// board.getPieces()[7][7] = new Piece(PieceColor.BLACK, PieceType.KING);
 		// }
-		
+
 		// {
 		// board.getPieces()[7][1] = new Piece(PieceColor.BLACK,
 		// PieceType.ROOK);
@@ -131,6 +128,7 @@ public class BmucController {
 		//
 		// }
 
+		board.internalEvaluation();
 		board.calculateThreats();
 	}
 }
