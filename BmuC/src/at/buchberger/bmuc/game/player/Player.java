@@ -6,4 +6,6 @@ public interface Player {
 
 	public Board choseMove(Board board);
 	
+	public boolean isHuman();
+	
 }

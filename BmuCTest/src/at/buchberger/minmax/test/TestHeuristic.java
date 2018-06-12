@@ -13,4 +13,9 @@ public class TestHeuristic implements Heuristic<TestNode> {
 	public void setInitialState(TestNode state) {
 	}
 
+	@Override
+	public int getCalmnessThreshold() {
+		return 0;
+	}
+
 }

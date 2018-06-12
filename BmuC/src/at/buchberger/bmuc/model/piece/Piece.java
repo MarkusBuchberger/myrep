@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import at.buchberger.bmuc.game.model.Board;
-import at.buchberger.bmuc.game.model.Coordinate;
 
 public class Piece {
 
@@ -175,6 +174,7 @@ public class Piece {
 	}
 
 	public void addThreats(int x, int y, Board board, boolean white) {
+
 		switch (type) {
 		case BISHOP:
 			addBishopThreats(x, y, board, white);

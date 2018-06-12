@@ -33,7 +33,8 @@ public class Board extends GameState<Board> {
 
 	private int finalHashCode;
 
-	private Collection<Board> tempFollowingStates = null;
+	private List<Board> tempFollowingStates = null;
+	
 
 	public Board() {
 		pieces = new Piece[8][];
@@ -230,14 +231,14 @@ public class Board extends GameState<Board> {
 		return !getFollowingStates(true).isEmpty();
 	}
 
-	public Collection<Board> getFollowingStates() {
+	public List<Board> getFollowingStates() {
 		return getFollowingStates(false);
 	}
 
-	public Collection<Board> getFollowingStates(boolean onlyCheckExists) {
+	public List<Board> getFollowingStates(boolean onlyCheckExists) {
 		if (tempFollowingStates != null)
 			return tempFollowingStates;
-		Collection<Board> states = new HashSet<Board>(getMoves(getActivePlayerColor(), onlyCheckExists));
+		List<Board> states = new ArrayList<Board>(getMoves(getActivePlayerColor(), onlyCheckExists));
 		if (!onlyCheckExists)
 			tempFollowingStates = states;
 		return states;
@@ -351,4 +352,8 @@ public class Board extends GameState<Board> {
 		return finalBoardState != null;
 	}
 
+	@Override
+	public Board getPreviousState() {
+		return lastBoard;
+	}
 }

@@ -1,4 +1,4 @@
-package at.buchberger.bmuc.game.player.ki;
+package at.buchberger.bmuc.game.player.ki.heuristic;
 
 import at.buchberger.algorithms.minmax.Heuristic;
 import at.buchberger.bmuc.game.model.Board;
@@ -23,7 +23,6 @@ public class SimpleHeuristic implements Heuristic<Board> {
 
 	@Override
 	public int evaluateGameState(Board gameState, int searchDepth) {
-		gameState.internalEvaluation();
 
 		if (gameState.getFinalBoardState() == FinalBoardState.STALEMATE)
 			return 0;
@@ -60,6 +59,11 @@ public class SimpleHeuristic implements Heuristic<Board> {
 				if (pieces[i][j] != null)
 					sum += pieces[i][j].getType().getSimpleValue() * (pieces[i][j].getColor() == activeColor ? 1 : -1);
 		return sum;
+	}
+	
+	@Override
+	public int getCalmnessThreshold() {
+		return 10;
 	}
 
 }

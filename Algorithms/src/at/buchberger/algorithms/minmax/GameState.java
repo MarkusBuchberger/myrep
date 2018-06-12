@@ -1,27 +1,36 @@
 package at.buchberger.algorithms.minmax;
 
-import java.util.Collection;
+import java.util.List;
 
 public abstract class GameState<T> {
 	
 	private int minMax;
-	private Collection<T> children;
+	
+	private int preSort;
+	
+	private List<T> children;
 	
 	
 	public abstract void internalEvaluation();
 	
-	public abstract Collection<T> getFollowingStates();
+	public abstract List<T> getFollowingStates();
 	
-	public abstract Collection<T> getFollowingStates(boolean onlyCheckExists);
+	public abstract List<T> getFollowingStates(boolean onlyCheckExists);
 	
 	public abstract boolean isFinalMove();
+	
+	public abstract T getPreviousState();
+	
+	public String getName() {
+		return null;
+	}
 
 
-	public Collection<T> getChildren() {
+	public List<T> getChildren() {
 		return children;
 	}
 
-	public void setChildren(Collection<T> children) {
+	public void setChildren(List<T> children) {
 		this.children = children;
 	}
 
@@ -35,6 +44,14 @@ public abstract class GameState<T> {
 
 	public void truncatePaths() {
 		children = null;
+	}
+
+	public int getPreSort() {
+		return preSort;
+	}
+
+	public void setPreSort(int preSort) {
+		this.preSort = preSort;
 	}
 	
 
