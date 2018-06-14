@@ -11,15 +11,19 @@ import at.buchberger.bmuc.game.player.Player;
 public class BmucSwingGameWorker extends SwingWorker<Board, Board> {
 
 	private BmucGuiController controller;
+	private Player player1;
+	private Player player2;
 
-	public BmucSwingGameWorker(BmucGuiController controller) {
+	public BmucSwingGameWorker(BmucGuiController controller, Player player1, Player player2) {
 		super();
 		this.controller = controller;
+		this.player1 = player1;
+		this.player2 = player2;
 	}
 
 	@Override
 	protected Board doInBackground() throws Exception {
-		Player activePlayer = controller.getPlayer1();
+		Player activePlayer = player1;
 
 		int turn = 1;
 
@@ -27,19 +31,19 @@ public class BmucSwingGameWorker extends SwingWorker<Board, Board> {
 
 		while (currentBoard.getFinalBoardState() == null && !currentBoard.getFollowingStates(true).isEmpty()) {
 			System.out
-					.println("\n turn " + turn + " " + (activePlayer == controller.getPlayer1() ? "White:" : "Black"));
+					.println("\n turn " + turn + " " + (activePlayer == player1 ? "White:" : "Black"));
 
 			Calendar start = Calendar.getInstance();
 			Board nextMove = activePlayer.choseMove(currentBoard);
-
+			nextMove.internalEvaluation();
 			currentBoard.truncatePaths();
 			currentBoard = nextMove;
 			currentBoard.printBoardToConsole();
 			System.out.println(
 					"elapsed time: " + (Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis()) + " ms");
 			publish(currentBoard);
-			activePlayer = activePlayer == controller.getPlayer1() ? controller.getPlayer2() : controller.getPlayer1();
-			if (activePlayer == controller.getPlayer1())
+			activePlayer = activePlayer == player1 ? player2 : player1;
+			if (activePlayer == player1)
 				turn++;
 
 		}
@@ -50,7 +54,7 @@ public class BmucSwingGameWorker extends SwingWorker<Board, Board> {
 	protected void process(List<Board> chunks) {
 		Board mostRecentValue = chunks.get(chunks.size() - 1);
 		controller.setCurrentBoard(mostRecentValue);
-		controller.tellThoseBloodyListeners();
+		controller.firedBoardChanged();
 	}
 
 }

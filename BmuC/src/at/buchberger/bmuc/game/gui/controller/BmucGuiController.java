@@ -1,20 +1,20 @@
 package at.buchberger.bmuc.game.gui.controller;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
+import at.buchberger.bmuc.game.gui.ChessBoard;
 import at.buchberger.bmuc.game.model.Board;
 import at.buchberger.bmuc.game.player.Player;
 import at.buchberger.bmuc.model.piece.Piece;
 import at.buchberger.bmuc.model.piece.PieceColor;
 import at.buchberger.bmuc.model.piece.PieceType;
 
-public class BmucGuiController {
+public class BmucGuiController extends MouseAdapter {
 
 	private Board currentBoard = null;
-	private Player player1;
-	private Player player2;
 
 	public Board getCurrentBoard() {
 		return currentBoard;
@@ -24,42 +24,81 @@ public class BmucGuiController {
 		this.currentBoard = currentBoard;
 	}
 
-	private List<BoardChangedListener> boardChangedListeners = new ArrayList<BoardChangedListener>();
+	private List<ModelChangedListener> boardChangedListeners = new ArrayList<ModelChangedListener>();
+
+	private List<GUIInputListener> guiInputListeners = new ArrayList<>();
 
 	public void startGame(Player player1, Player player2) {
+		guiInputListeners.clear();
 		this.currentBoard = new Board();
-		this.setPlayer1(player1);
-		this.setPlayer2(player2);
 		initStartingPositions(currentBoard);
-		tellThoseBloodyListeners();
-		
-		new BmucSwingGameWorker(this).execute();
+		firedBoardChanged();
+
+		if (player1 instanceof GUIInputListener)
+			guiInputListeners.add((GUIInputListener) player1);
+		if (player2 instanceof GUIInputListener)
+			guiInputListeners.add((GUIInputListener) player2);
+
+		new BmucSwingGameWorker(this, player1, player2).execute();
 	}
 
-	public void playGame(Player player1, Player player2) {
+	private int currentPressedFieldX = -1;
+	private int currentPressedFieldY = -1;
 
-		Player activePlayer = player1;
+	@Override
+	public void mousePressed(MouseEvent e) {
+		super.mousePressed(e);
 
-		int turn = 1;
+		currentPressedFieldX = calcField(e.getY(), false);
+		currentPressedFieldY = calcField(e.getX(), true);
 
-		while (currentBoard.getFinalBoardState() == null && !currentBoard.getFollowingStates(true).isEmpty()) {
-			System.out.println("\n turn " + turn + " " + (activePlayer == player1 ? "White:" : "Black"));
+		System.out.println("pressed " + e.getX() + " " + e.getY());
+		System.out.println("pressed " + e.getSource());
 
-			Calendar start = Calendar.getInstance();
-			Board nextMove = activePlayer.choseMove(currentBoard);
+	}
 
-			currentBoard.truncatePaths();
-			currentBoard = nextMove;
-			currentBoard.printBoardToConsole();
-			System.out.println(
-					"elapsed time: " + (Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis()) + " ms");
-			tellThoseBloodyListeners();
-			activePlayer = activePlayer == player1 ? player2 : player1;
-			if (activePlayer == player1)
-				turn++;
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		super.mouseReleased(e);
+		System.out.println("released " + e.getX() + " " + e.getY());
+		System.out.println("released " + e.getSource());
 
+		int releasedFieldX = calcField(e.getY(), false);
+		int releasedFieldY = calcField(e.getX(), true);
+
+		if (currentPressedFieldX != -1 && currentPressedFieldY != -1 && releasedFieldX != -1 && releasedFieldY != -1) {
+			Board chosenMove = null;
+			System.out.println("try move: " + currentPressedFieldX + "," + currentPressedFieldY + " -> "
+					+ releasedFieldX + "," + releasedFieldY);
+			for (Board nextMove : currentBoard.getMoves(currentPressedFieldX, currentPressedFieldY)) {
+				// TODO: Multiple moves possible in case of promotion!!! let player chose or
+				// take queen?
+
+				System.out.println("possible move: " + nextMove.getLastMoveX() + "," + nextMove.getLastMoveY());
+				if (nextMove.getLastMoveX() == releasedFieldX && nextMove.getLastMoveY() == releasedFieldY)
+					chosenMove = nextMove;
+			}
+
+			if (chosenMove != null)
+				System.out.println("chosen");
+			if (chosenMove != null)
+				for (GUIInputListener listener : guiInputListeners)
+					listener.moveChosen(chosenMove);
 		}
-		System.out.println(currentBoard.getFinalBoardState());
+		// reset
+		currentPressedFieldX = -1;
+		currentPressedFieldY = -1;
+
+	}
+
+	private int calcField(int pixelVal, boolean yValue) {
+		int withoutBorder = pixelVal - ChessBoard.BORDER_SIZE;
+
+		int field = withoutBorder / ChessBoard.FIELD_SIZE;
+		if (field > -1 && field < 8) {
+			return yValue ? field : 7 - field;
+		}
+		return -1;
 	}
 
 	private void initStartingPositions(Board board) {
@@ -105,28 +144,21 @@ public class BmucGuiController {
 		board.calculateThreats();
 	}
 
-	public void tellThoseBloodyListeners() {
-		for (BoardChangedListener listener : boardChangedListeners)
+	public void firedBoardChanged() {
+		for (ModelChangedListener listener : boardChangedListeners)
 			listener.boardChanged(currentBoard);
 	}
 
-	public void addBoardChangedListener(BoardChangedListener listener) {
+	public void addBoardChangedListener(ModelChangedListener listener) {
 		this.boardChangedListeners.add(listener);
 	}
 
-	public Player getPlayer1() {
-		return player1;
+	public void addGuiInputListener(GUIInputListener listener) {
+		guiInputListeners.add(listener);
 	}
 
-	public void setPlayer1(Player player1) {
-		this.player1 = player1;
+	public void removeAllGuiInputListeners() {
+		guiInputListeners.clear();
 	}
 
-	public Player getPlayer2() {
-		return player2;
-	}
-
-	public void setPlayer2(Player player2) {
-		this.player2 = player2;
-	}
 }

@@ -10,11 +10,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
 import at.buchberger.bmuc.game.gui.controller.BmucGuiController;
-import at.buchberger.bmuc.game.player.ki.BBraham;
+import at.buchberger.bmuc.game.player.Human;
 import at.buchberger.bmuc.game.player.ki.CBraham;
 
 public class BmuCGUI {
 
+
+	
 	private static void createAndShowGUI() throws IOException {
 
 		BmucGuiController controller = new BmucGuiController();
@@ -36,11 +38,12 @@ public class BmuCGUI {
 		ChessBoard chessBoard = new ChessBoard();
 		controller.addBoardChangedListener(chessBoard);
 		contentPane.add(chessBoard);
+		chessBoard.addMouseListener(controller);
 
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		controller.startGame(new CBraham(), new BBraham());
+		controller.startGame(new Human(),new CBraham() );
 		// controller.playGame(new CBraham(), new BBraham());
 
 	}

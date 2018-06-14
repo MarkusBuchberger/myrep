@@ -34,7 +34,9 @@ public class Board extends GameState<Board> {
 	private int finalHashCode;
 
 	private List<Board> tempFollowingStates = null;
-	
+
+	private int lastMoveX;
+	private int lastMoveY;
 
 	public Board() {
 		pieces = new Piece[8][];
@@ -77,15 +79,20 @@ public class Board extends GameState<Board> {
 	}
 
 	public Collection<Board> getMoves(PieceColor color) {
-		return getMoves(color, false);
+		return getMoves(color, -1, -1, false);
 	}
 
-	public Collection<Board> getMoves(PieceColor color, boolean onlyCheckExists) {
+	public Collection<Board> getMoves(int x, int y) {
+		return getMoves(getActivePlayerColor(), x, y, false);
+	}
+
+	public Collection<Board> getMoves(PieceColor color, int onlyX, int onlyY, boolean onlyCheckExists) {
 		List<Board> moves = new ArrayList<Board>();
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				Piece piece = this.getPieces()[i][j];
-				if (piece != null && (color == null || piece.getColor() == color)) {
+				if (piece != null && (color == null || piece.getColor() == color)
+						&& (onlyX == -1 || onlyY == -1 || (onlyX == i && onlyY == j))) {
 					moves.addAll(piece.getMoves(i, j, this));
 				}
 				if (onlyCheckExists && moves.size() > 0)
@@ -238,7 +245,7 @@ public class Board extends GameState<Board> {
 	public List<Board> getFollowingStates(boolean onlyCheckExists) {
 		if (tempFollowingStates != null)
 			return tempFollowingStates;
-		List<Board> states = new ArrayList<Board>(getMoves(getActivePlayerColor(), onlyCheckExists));
+		List<Board> states = new ArrayList<Board>(getMoves(getActivePlayerColor(), -1, -1, onlyCheckExists));
 		if (!onlyCheckExists)
 			tempFollowingStates = states;
 		return states;
@@ -355,5 +362,21 @@ public class Board extends GameState<Board> {
 	@Override
 	public Board getPreviousState() {
 		return lastBoard;
+	}
+
+	public int getLastMoveX() {
+		return lastMoveX;
+	}
+
+	public void setLastMoveX(int lastMoveX) {
+		this.lastMoveX = lastMoveX;
+	}
+
+	public int getLastMoveY() {
+		return lastMoveY;
+	}
+
+	public void setLastMoveY(int lastMoveY) {
+		this.lastMoveY = lastMoveY;
 	}
 }

@@ -1,18 +1,46 @@
 package at.buchberger.bmuc.game.player;
 
+import at.buchberger.bmuc.game.gui.controller.GUIInputListener;
 import at.buchberger.bmuc.game.model.Board;
 
-public class Human implements Player {
+public class Human implements Player, GUIInputListener {
+
+	private Board nextMove = null;
+
+	private Object lock = new Object();
 
 	@Override
 	public Board choseMove(Board board) {
-		// TODO Auto-generated method stub
-		return null;
+
+		synchronized (lock) {
+			try {
+				System.out.println("waiting for player move");
+				lock.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		System.out.println("commencing");
+
+		Board temp = nextMove;
+		nextMove = null;
+		return temp;
 	}
 
 	@Override
 	public boolean isHuman() {
 		return true;
+	}
+
+	@Override
+	public void moveChosen(Board chosenMove) {
+		nextMove = chosenMove;
+		
+		synchronized (lock) {
+			lock.notify();
+		}
+		
 	}
 
 }

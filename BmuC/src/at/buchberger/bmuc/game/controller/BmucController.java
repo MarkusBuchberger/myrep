@@ -4,7 +4,6 @@ import java.util.Calendar;
 
 import at.buchberger.bmuc.game.model.Board;
 import at.buchberger.bmuc.game.player.Player;
-import at.buchberger.bmuc.game.player.ki.CBraham;
 import at.buchberger.bmuc.model.piece.Piece;
 import at.buchberger.bmuc.model.piece.PieceColor;
 import at.buchberger.bmuc.model.piece.PieceType;

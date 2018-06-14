@@ -6,12 +6,12 @@ import java.awt.Graphics;
 
 import javax.swing.JLabel;
 
-import at.buchberger.bmuc.game.gui.controller.BoardChangedListener;
+import at.buchberger.bmuc.game.gui.controller.ModelChangedListener;
 import at.buchberger.bmuc.game.gui.graphics.BmucGraphics;
 import at.buchberger.bmuc.game.model.Board;
 import at.buchberger.bmuc.model.piece.Piece;
 
-public class ChessField extends JLabel implements BoardChangedListener {
+public class ChessField extends JLabel implements ModelChangedListener {
 
 	private Board currentBoard = null;
 	private int x;
@@ -24,7 +24,7 @@ public class ChessField extends JLabel implements BoardChangedListener {
 		this.y = j;
 		setBackground((i + j) % 2 == 1 ? new Color(255, 206, 158) : new Color(209, 139, 71));
 		setOpaque(true);
-		setPreferredSize(new Dimension(70, 70));
+		setPreferredSize(new Dimension(ChessBoard.FIELD_SIZE, ChessBoard.FIELD_SIZE));
 	}
 
 	@Override
@@ -32,7 +32,11 @@ public class ChessField extends JLabel implements BoardChangedListener {
 		super.paintComponent(g);
 		Piece piece = currentBoard != null ? currentBoard.getPieces()[x][y] : null;
 		if (piece != null)
-			g.drawImage(BmucGraphics.getGraphics(piece), 5, 5, null);
+			g.drawImage(BmucGraphics.getGraphics(piece), ChessBoard.BORDER_SIZE / 2, ChessBoard.BORDER_SIZE / 2, null);
+		if (currentBoard.getLastMoveX() == x && currentBoard.getLastMoveY() == y) {
+			g.setColor(Color.YELLOW);
+			g.drawRect(0, 0, ChessBoard.FIELD_SIZE - 1, ChessBoard.FIELD_SIZE - 1);
+		}
 	}
 
 	@Override

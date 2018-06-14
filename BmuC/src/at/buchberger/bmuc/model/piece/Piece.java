@@ -237,6 +237,8 @@ public class Piece {
 		Piece king = rochadeMove.getPieces()[x][kingY];
 		rochadeMove.getPieces()[x][kingY] = null;
 		rochadeMove.getPieces()[x][kingY + kingDirection * 2] = king;
+		rochadeMove.setLastMoveX(x);
+		rochadeMove.setLastMoveY(kingY + kingDirection * 2);
 		Piece rook = rochadeMove.getPieces()[x][RookY];
 		rochadeMove.getPieces()[x][RookY] = null;
 		rochadeMove.getPieces()[x][kingY + kingDirection * 2 - kingDirection] = rook;
@@ -260,6 +262,8 @@ public class Piece {
 			promotionMove.getPieces()[remX][remY] = null;
 			Piece piece = new Piece(color, PieceType.BISHOP);
 			promotionMove.getPieces()[x][y] = piece;
+			promotionMove.setLastMoveX(x);
+			promotionMove.setLastMoveY(y);
 			promotionMoves.add(createMove(-1, -1, -1, -1, board, -1, -1, promotionMove));
 		}
 
@@ -269,6 +273,8 @@ public class Piece {
 			promotionMove.getPieces()[remX][remY] = null;
 			Piece piece = new Piece(color, PieceType.KNIGHT);
 			promotionMove.getPieces()[x][y] = piece;
+			promotionMove.setLastMoveX(x);
+			promotionMove.setLastMoveY(y);
 			promotionMoves.add(createMove(-1, -1, -1, -1, board, -1, -1, promotionMove));
 		}
 
@@ -278,6 +284,8 @@ public class Piece {
 			promotionMove.getPieces()[remX][remY] = null;
 			Piece piece = new Piece(color, PieceType.ROOK);
 			promotionMove.getPieces()[x][y] = piece;
+			promotionMove.setLastMoveX(x);
+			promotionMove.setLastMoveY(y);
 			promotionMoves.add(createMove(-1, -1, -1, -1, board, -1, -1, promotionMove));
 		}
 
@@ -287,6 +295,8 @@ public class Piece {
 			promotionMove.getPieces()[remX][remY] = null;
 			Piece piece = new Piece(color, PieceType.QUEEN);
 			promotionMove.getPieces()[x][y] = piece;
+			promotionMove.setLastMoveX(x);
+			promotionMove.setLastMoveY(y);
 			promotionMoves.add(createMove(-1, -1, -1, -1, board, -1, -1, promotionMove));
 		}
 		return promotionMoves;
@@ -305,6 +315,8 @@ public class Piece {
 
 				move.getPieces()[origX][origY] = null;
 				move.getPieces()[x][y] = this;
+				move.setLastMoveX(x);
+				move.setLastMoveY(y);
 
 				if (remX > -1 && remY > -1)
 					move.getPieces()[remX][remY] = null;
