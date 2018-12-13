@@ -246,8 +246,8 @@ public class Board extends GameState<Board> {
 		if (tempFollowingStates != null)
 			return tempFollowingStates;
 		List<Board> states = new ArrayList<Board>(getMoves(getActivePlayerColor(), -1, -1, onlyCheckExists));
-		if (!onlyCheckExists)
-			tempFollowingStates = states;
+		// if (!onlyCheckExists)
+		// tempFollowingStates = states;
 		return states;
 	}
 

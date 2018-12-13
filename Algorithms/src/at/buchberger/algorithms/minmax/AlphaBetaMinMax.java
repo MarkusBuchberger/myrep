@@ -27,8 +27,7 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 
 	private int moves = 0;
 	private int maxDepth = 0;
-	
-	
+
 	public T chooseMove(T state) {
 		heuristic.setInitialState(state);
 		moves = 0;
@@ -46,14 +45,14 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 		buildMinMaxTree(state, minimumDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
 
 		System.out.println(moves + " moves to calculate");
-		System.out.println(Math.abs(maxDepth -minimumDepth) + " max depth");
+		System.out.println(Math.abs(maxDepth - minimumDepth) + " max depth");
 		int bestMinMax = Integer.MIN_VALUE;
 		T bestMove = null;
 		List<T> list = new ArrayList<T>(state.getChildren());
 
 		// Collections.shuffle(list);
 		for (T child : list) {
-			System.out.print(child.getMinMax() + " ");
+			// System.out.print(child.getMinMax() + " ");
 			if (child.getMinMax() >= bestMinMax) {
 				bestMove = child;
 				bestMinMax = child.getMinMax();
@@ -62,12 +61,12 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 		System.out.println("\nbest result:  " + bestMinMax);
 		// System.out.println("eval" + " " + bestMove.getEvaluation());
 
-		if (bestMove.getChildren() != null) {
-			// System.out.println(bestMove.getChildren().size());
-
-			for (T child : bestMove.getChildren())
-				System.out.print(child.getMinMax() + " ");
-		}
+		// if (bestMove.getChildren() != null) {
+		// // System.out.println(bestMove.getChildren().size());
+		//
+		// for (T child : bestMove.getChildren())
+		// System.out.print(child.getMinMax() + " ");
+		// }
 
 		return bestMove;
 
@@ -82,9 +81,10 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 			if (depth <= 0)
 				state.setMinMax(heuristic.evaluateGameState(state, depth));
 
-			if (depth > 0 || (expandUncalmStates && moves < 300000 && Math.abs(
-					state.getMinMax() - heuristic.evaluateGameState(state.getPreviousState(), depth + 1)) > heuristic
-							.getCalmnessThreshold())) {
+			if (depth > 0 || (expandUncalmStates && moves < 300000
+					&& Math.abs(state.getMinMax()
+							- heuristic.evaluateGameState(state.getPreviousState(), depth + 1)) > heuristic
+									.getCalmnessThreshold())) {
 				List<T> children = state.getFollowingStates();
 				state.setChildren(new ArrayList<T>());
 				Collections.shuffle(children);
@@ -99,7 +99,8 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 				if (maxPlayer) {
 					int maxValue = Integer.MIN_VALUE;
 					for (T child : children) {
-						state.getChildren().add(child);
+						if (depth == minimumDepth)
+							state.getChildren().add(child);
 						buildMinMaxTree(child, depth - 1, alpha, beta, false);
 
 						maxValue = Math.max(maxValue, child.getMinMax());
@@ -116,9 +117,10 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 				} else {
 					int minValue = Integer.MAX_VALUE;
 					for (T child : children) {
-						state.getChildren().add(child);
+						if (depth == minimumDepth)
+							state.getChildren().add(child);
 						buildMinMaxTree(child, depth - 1, alpha, beta, true);
-						state.getChildren().add(child);
+						// state.getChildren().add(child);
 						minValue = Math.min(minValue, child.getMinMax());
 						beta = Math.min(beta, minValue);
 						if (useAlphaBetaPruning && beta < alpha) {

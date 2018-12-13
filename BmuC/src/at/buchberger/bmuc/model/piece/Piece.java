@@ -136,7 +136,7 @@ public class Piece {
 				if ((x == 4 && color == PieceColor.WHITE) || (x == 3 && color == PieceColor.BLACK)) {
 					Piece leftPiece = y - 1 > -1 ? board.getPieces()[x][y - 1] : null;
 					if (leftPiece != null && leftPiece == board.getEnPassantVulnerable()) {
-						moves.add(createMove(x, y, x + direction, y + 1, board, x, y + 1, null));
+						moves.add(createMove(x, y, x + direction, y - 1, board, x, y - 1, null));
 					}
 
 					Piece rightPiece = y + 1 < 8 ? board.getPieces()[x][y + 1] : null;
