@@ -198,7 +198,7 @@ public class MinMaxTester {
 		TestNode child3 = new TestNode(9);
 		root.add(child3);
 
-		AlphaBetaMinMax<TestNode> minMax = new AlphaBetaMinMax<>(new TestHeuristic(), 4, true, new TestHeuristic(), false);
+		AlphaBetaMinMax<TestNode> minMax = new AlphaBetaMinMax<>(new TestHeuristic(), 4, true, new TestHeuristic(), false, false);
 		assertEquals(20, minMax.chooseMove(root).getMinMax());
 
 	}
@@ -303,7 +303,7 @@ public class MinMaxTester {
 		TestNode child3221 = new TestNode(6, "child3221");
 		child322.add(child3221);
 
-		AlphaBetaMinMax<TestNode> minMax = new AlphaBetaMinMax<>(new TestHeuristic(), 4, true, new TestHeuristic(), false);
+		AlphaBetaMinMax<TestNode> minMax = new AlphaBetaMinMax<>(new TestHeuristic(), 4, true, new TestHeuristic(), false, false);
 		assertEquals(6, minMax.chooseMove(root).getMinMax());
 
 	}
@@ -396,7 +396,7 @@ public class MinMaxTester {
 			child32.add(child323);
 		}
 
-		AlphaBetaMinMax<TestNode> minMax = new AlphaBetaMinMax<>(new TestHeuristic(), 4, true, new TestHeuristic(), false);
+		AlphaBetaMinMax<TestNode> minMax = new AlphaBetaMinMax<>(new TestHeuristic(), 4, true, new TestHeuristic(), false, false);
 		assertEquals(12, minMax.chooseMove(root).getMinMax());
 
 	}
@@ -479,7 +479,7 @@ public class MinMaxTester {
 
 		}
 
-		AlphaBetaMinMax<TestNode> minMax = new AlphaBetaMinMax<>(new TestHeuristic(), 4, true, new TestHeuristic(), false);
+		AlphaBetaMinMax<TestNode> minMax = new AlphaBetaMinMax<>(new TestHeuristic(), 4, true, new TestHeuristic(), false, false);
 		assertEquals(8, minMax.chooseMove(root).getMinMax());
 
 	}

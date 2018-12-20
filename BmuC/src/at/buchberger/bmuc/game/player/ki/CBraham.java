@@ -7,8 +7,7 @@ import at.buchberger.bmuc.game.player.ki.heuristic.SimpleHeuristic;
 
 public class CBraham implements Player {
 
-	private AlphaBetaMinMax<Board> minMax = new AlphaBetaMinMax<Board>(new SimpleHeuristic(false), 5, true, null,
-			false);
+	private AlphaBetaMinMax<Board> minMax = new AlphaBetaMinMax<Board>(new SimpleHeuristic(false), 5, true, new SimpleHeuristic(true), false, false);
 
 	@Override
 	public Board choseMove(Board board) {

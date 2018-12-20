@@ -8,8 +8,8 @@ public class BeatMeUpChess {
 	public static void main(String[] args) {
 		double sum = 0;
 		int games = 0;
-		while (Math.abs(sum) < 10) {
-			sum += BmucController.playGame(new CBraham(), new BBraham());
+		while (Math.abs(sum) < 100) {
+			sum += BmucController.playGame(new CBraham(), new BBraham(), null);
 			games++;
 
 			System.out.println(sum + " (" + games + ")");

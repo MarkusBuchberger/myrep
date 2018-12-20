@@ -3,6 +3,7 @@ package at.buchberger.algorithms.minmax;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 public class AlphaBetaMinMax<T extends GameState<T>> {
@@ -12,21 +13,24 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 	private boolean useAlphaBetaPruning;
 	private int minimumDepth;
 	private boolean expandUncalmStates;
+	private boolean useKillerHeuristic;
 
 	private Comparator<T> preSortComparator;
 
 	public AlphaBetaMinMax(Heuristic<T> heuristic, int minimumDepth, boolean useAlphaBetaPruning,
-			Heuristic<T> preSortHeuristic, boolean expandUncalmStates) {
+			Heuristic<T> preSortHeuristic, boolean expandUncalmStates, boolean useKillerHeuristic) {
 		super();
 		this.heuristic = heuristic;
 		this.minimumDepth = minimumDepth;
 		this.useAlphaBetaPruning = useAlphaBetaPruning;
 		this.preSortHeuristic = preSortHeuristic;
 		this.expandUncalmStates = expandUncalmStates;
+		this.useKillerHeuristic = useKillerHeuristic;
 	}
 
 	private int moves = 0;
 	private int maxDepth = 0;
+	private HashMap<Integer, Integer> killerHeuristicHashes = new HashMap<>();
 
 	public T chooseMove(T state) {
 		heuristic.setInitialState(state);
@@ -81,18 +85,20 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 			if (depth <= 0)
 				state.setMinMax(heuristic.evaluateGameState(state, depth));
 
-			if (depth > 0 || (expandUncalmStates && moves < 300000
+			if (depth > 0 || (expandUncalmStates && moves < 3000000
 					&& Math.abs(state.getMinMax()
 							- heuristic.evaluateGameState(state.getPreviousState(), depth + 1)) > heuristic
 									.getCalmnessThreshold())) {
 				List<T> children = state.getFollowingStates();
 				state.setChildren(new ArrayList<T>());
 				Collections.shuffle(children);
-				if (preSortHeuristic != null && preSortComparator != null) {
+				if (preSortHeuristic != null && preSortComparator != null && depth > 0) {
 					for (T child : children) {
 						child.setPreSort(preSortHeuristic.evaluateGameState(child, 1));
 					}
 					Collections.sort(children, preSortComparator);
+					if(maxPlayer)
+						Collections.reverse(children);
 				}
 
 				// System.out.println(state.getName() + " " + alpha + " " + beta);
@@ -109,6 +115,9 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 							// System.out.println(depth + " " + child.getMinMax() + " betacut after " +
 							// child.getName() + " "
 							// + beta + " < " + alpha);
+							if(useKillerHeuristic)
+								killerHeuristicHashes.put(Integer.valueOf(depth), child.hashCode());
+							
 							break; // beta cut
 						}
 

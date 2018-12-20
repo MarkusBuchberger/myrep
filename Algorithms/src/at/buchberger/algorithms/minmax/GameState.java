@@ -54,5 +54,7 @@ public abstract class GameState<T> {
 		this.preSort = preSort;
 	}
 	
+	public abstract int getHashCodeForKillerHeuristic();
+	
 
 }

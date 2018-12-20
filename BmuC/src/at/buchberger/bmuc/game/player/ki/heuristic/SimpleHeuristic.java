@@ -27,7 +27,7 @@ public class SimpleHeuristic implements Heuristic<Board> {
 		if (gameState.getFinalBoardState() == FinalBoardState.STALEMATE)
 			return 0;
 		if (gameState.getFinalBoardState() == FinalBoardState.REPETITION)
-			return -999999;
+			return 0;
 
 		if (gameState.getFinalBoardState() == FinalBoardState.CHESSMATE) // the sooner mate, the better
 			return (gameState.getActivePlayerColor() == activeColor ? -1 : 1) * (searchDepth + 1) * 100000;

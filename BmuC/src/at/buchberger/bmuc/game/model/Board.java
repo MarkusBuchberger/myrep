@@ -349,6 +349,11 @@ public class Board extends GameState<Board> {
 		this.finalHashCode = finalHashCode;
 	}
 
+	@Override
+	public int getHashCodeForKillerHeuristic() {
+		return this.finalHashCode;
+	}
+	
 	public void truncatePaths() {
 		super.truncatePaths();
 		tempFollowingStates = null;

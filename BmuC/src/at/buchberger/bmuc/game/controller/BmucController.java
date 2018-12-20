@@ -11,6 +11,10 @@ import at.buchberger.bmuc.model.piece.PieceType;
 public class BmucController {
 
 	public static double playGame(Player player1, Player player2) {
+		return playGame(player1, player2, null);
+	}
+
+	public static double playGame(Player player1, Player player2, Player comparePlayer2) {
 		Board currentState = new Board();
 		initStartingPositions(currentState);
 
@@ -21,16 +25,28 @@ public class BmucController {
 		while (currentState.getFinalBoardState() == null && !currentState.getFollowingStates(true).isEmpty()) {
 			System.out.println("\n turn " + turn + " " + (activePlayer == player1 ? "White:" : "Black"));
 
+			Board currentMove = currentState;
+
 			Calendar start = Calendar.getInstance();
 			Board nextMove = activePlayer.choseMove(currentState);
 
-			//Board temp1 = currentState;
+			// Board temp1 = currentState;
 
 			currentState.truncatePaths();
 			currentState = nextMove;
 			currentState.printBoardToConsole();
 			System.out.println(
 					"elapsed time: " + (Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis()) + " ms");
+
+			if (comparePlayer2 != null && activePlayer == player2) {
+				System.out.println("COMPARE");
+				Calendar startCompare = Calendar.getInstance();
+				Board nextMoveCompare = comparePlayer2.choseMove(currentMove);
+				nextMoveCompare.printBoardToConsole();
+				System.out.println("elapsed time: "
+						+ (Calendar.getInstance().getTimeInMillis() - startCompare.getTimeInMillis()) + " ms");
+				System.out.println("COMPARE END");
+			}
 
 			// if (activePlayer == player2) {
 			// System.out.println("Compare CBraham:");
