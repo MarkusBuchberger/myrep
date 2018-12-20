@@ -30,7 +30,6 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 
 	private int moves = 0;
 	private int maxDepth = 0;
-	private HashMap<Integer, Integer> killerHeuristicHashes = new HashMap<>();
 
 	public T chooseMove(T state) {
 		heuristic.setInitialState(state);
@@ -92,6 +91,9 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 				List<T> children = state.getFollowingStates();
 				state.setChildren(new ArrayList<T>());
 				Collections.shuffle(children);
+				
+
+				
 				if (preSortHeuristic != null && preSortComparator != null && depth > 0) {
 					for (T child : children) {
 						child.setPreSort(preSortHeuristic.evaluateGameState(child, 1));
@@ -114,10 +116,7 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 						if (useAlphaBetaPruning && beta <= alpha) {
 							// System.out.println(depth + " " + child.getMinMax() + " betacut after " +
 							// child.getName() + " "
-							// + beta + " < " + alpha);
-							if(useKillerHeuristic)
-								killerHeuristicHashes.put(Integer.valueOf(depth), child.hashCode());
-							
+							// + beta + " < " + alpha);						
 							break; // beta cut
 						}
 

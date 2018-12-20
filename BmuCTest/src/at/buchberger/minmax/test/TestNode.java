@@ -66,9 +66,4 @@ public class TestNode extends GameState<TestNode> {
 		return null;
 	}
 
-	@Override
-	public int getHashCodeForKillerHeuristic() {
-		return hashCode();
-	}
-
 }
