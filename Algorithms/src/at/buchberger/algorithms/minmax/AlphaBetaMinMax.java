@@ -1,9 +1,7 @@
 package at.buchberger.algorithms.minmax;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 public class AlphaBetaMinMax<T extends GameState<T>> {
@@ -45,96 +43,69 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 			};
 		}
 
-		buildMinMaxTree(state, minimumDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
+		T chosenState = buildMinMaxTree(state, minimumDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
 
 		System.out.println(moves + " moves to calculate");
 		System.out.println(Math.abs(maxDepth - minimumDepth) + " max depth");
-		int bestMinMax = Integer.MIN_VALUE;
-		T bestMove = null;
-		List<T> list = new ArrayList<T>(state.getChildren());
 
-		// Collections.shuffle(list);
-		for (T child : list) {
-			// System.out.print(child.getMinMax() + " ");
-			if (child.getMinMax() >= bestMinMax) {
-				bestMove = child;
-				bestMinMax = child.getMinMax();
-			}
-		}
-		System.out.println("\nbest result:  " + bestMinMax);
-		// System.out.println("eval" + " " + bestMove.getEvaluation());
+		System.out.println("\nbest result:  " + chosenState.getMinMax());
 
-		// if (bestMove.getChildren() != null) {
-		// // System.out.println(bestMove.getChildren().size());
-		//
-		// for (T child : bestMove.getChildren())
-		// System.out.print(child.getMinMax() + " ");
-		// }
-
-		return bestMove;
+		return chosenState;
 
 	}
 
-	private void buildMinMaxTree(T state, int depth, int alpha, int beta, boolean maxPlayer) {
+	private T buildMinMaxTree(T state, int depth, int alpha, int beta, boolean maxPlayer) {
 		moves++;
 		maxDepth = Math.min(maxDepth, depth);
+		T chosenChild = null;
 		if (state.isFinalMove()) {
 			state.setMinMax(heuristic.evaluateGameState(state, depth));
 		} else {
 			if (depth <= 0)
 				state.setMinMax(heuristic.evaluateGameState(state, depth));
 
-			if (depth > 0 || (expandUncalmStates && moves < 3000000
+			boolean expand = depth > 0;
+			expand |= expandUncalmStates && moves < 3000000
 					&& Math.abs(state.getMinMax()
 							- heuristic.evaluateGameState(state.getPreviousState(), depth + 1)) > heuristic
-									.getCalmnessThreshold())) {
+									.getCalmnessThreshold();
+			if (expand) {
 				List<T> children = state.getFollowingStates();
-				state.setChildren(new ArrayList<T>());
-				Collections.shuffle(children);
-				
-
-				
 				if (preSortHeuristic != null && preSortComparator != null && depth > 0) {
 					for (T child : children) {
 						child.setPreSort(preSortHeuristic.evaluateGameState(child, 1));
 					}
 					Collections.sort(children, preSortComparator);
-					if(maxPlayer)
+					if (maxPlayer)
 						Collections.reverse(children);
 				}
 
-				// System.out.println(state.getName() + " " + alpha + " " + beta);
 				if (maxPlayer) {
 					int maxValue = Integer.MIN_VALUE;
 					for (T child : children) {
-						if (depth == minimumDepth)
-							state.getChildren().add(child);
 						buildMinMaxTree(child, depth - 1, alpha, beta, false);
-
-						maxValue = Math.max(maxValue, child.getMinMax());
+						if (child.getMinMax() > maxValue) {
+							maxValue = child.getMinMax();
+							chosenChild = child;
+						}
 						alpha = Math.max(alpha, maxValue);
 						if (useAlphaBetaPruning && beta <= alpha) {
-							// System.out.println(depth + " " + child.getMinMax() + " betacut after " +
-							// child.getName() + " "
-							// + beta + " < " + alpha);						
 							break; // beta cut
 						}
-
 					}
 					state.setMinMax(maxValue);
 				} else {
 					int minValue = Integer.MAX_VALUE;
 					for (T child : children) {
-						if (depth == minimumDepth)
-							state.getChildren().add(child);
 						buildMinMaxTree(child, depth - 1, alpha, beta, true);
-						// state.getChildren().add(child);
-						minValue = Math.min(minValue, child.getMinMax());
+
+						if (child.getMinMax() < minValue) {
+							minValue = child.getMinMax();
+							chosenChild = child;
+						}
+
 						beta = Math.min(beta, minValue);
 						if (useAlphaBetaPruning && beta < alpha) {
-							// System.out.println(depth + " " + child.getMinMax() + " alphacut after " +
-							// child.getName() + " "
-							// + beta + " < " + alpha);
 							break; // alpha cut
 						}
 					}
@@ -142,5 +113,6 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 				}
 			}
 		}
+		return chosenChild;
 	}
 }

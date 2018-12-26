@@ -36,7 +36,7 @@ public class BmucSwingGameWorker extends SwingWorker<Board, Board> {
 			Calendar start = Calendar.getInstance();
 			Board nextMove = activePlayer.choseMove(currentBoard);
 			nextMove.internalEvaluation();
-			currentBoard.truncatePaths();
+
 			currentBoard = nextMove;
 			currentBoard.printBoardToConsole();
 			System.out.println(

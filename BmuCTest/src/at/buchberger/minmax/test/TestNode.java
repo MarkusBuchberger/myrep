@@ -10,6 +10,8 @@ public class TestNode extends GameState<TestNode> {
 	private int value;
 	private String name;
 
+	private ArrayList<TestNode> children = new ArrayList<TestNode>();
+
 	public TestNode(int value) {
 		this.value = value;
 	}
@@ -25,27 +27,21 @@ public class TestNode extends GameState<TestNode> {
 
 	@Override
 	public List<TestNode> getFollowingStates() {
-		if (getChildren() == null)
-			setChildren(new ArrayList<TestNode>());
-		return getChildren();
+		return children;
 	}
 
 	@Override
 	public List<TestNode> getFollowingStates(boolean onlyCheckExists) {
-		if (getChildren() == null)
-			setChildren(new ArrayList<TestNode>());
-		return getChildren();
+		return children;
 	}
 
 	@Override
 	public boolean isFinalMove() {
-		return getChildren() == null || getChildren().isEmpty();
+		return children.isEmpty();
 	}
 
 	public void add(TestNode node) {
-		if (getChildren() == null)
-			setChildren(new ArrayList<TestNode>());
-		getChildren().add(node);
+		children.add(node);
 	}
 
 	public int getValue() {
@@ -60,7 +56,7 @@ public class TestNode extends GameState<TestNode> {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	@Override
 	public TestNode getPreviousState() {
 		return null;

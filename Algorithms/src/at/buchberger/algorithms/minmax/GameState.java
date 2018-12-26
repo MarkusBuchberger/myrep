@@ -8,8 +8,6 @@ public abstract class GameState<T> {
 	
 	private int preSort;
 	
-	private List<T> children;
-	
 	
 	public abstract void internalEvaluation();
 	
@@ -25,15 +23,6 @@ public abstract class GameState<T> {
 		return null;
 	}
 
-
-	public List<T> getChildren() {
-		return children;
-	}
-
-	public void setChildren(List<T> children) {
-		this.children = children;
-	}
-
 	public int getMinMax() {
 		return minMax;
 	}
@@ -42,9 +31,6 @@ public abstract class GameState<T> {
 		this.minMax = minMax;
 	}
 
-	public void truncatePaths() {
-		children = null;
-	}
 
 	public int getPreSort() {
 		return preSort;

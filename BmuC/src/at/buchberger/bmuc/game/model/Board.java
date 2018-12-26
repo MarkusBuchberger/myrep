@@ -349,10 +349,6 @@ public class Board extends GameState<Board> {
 		this.finalHashCode = finalHashCode;
 	}
 
-	public void truncatePaths() {
-		super.truncatePaths();
-		tempFollowingStates = null;
-	}
 
 	@Override
 	public boolean isFinalMove() {

@@ -15,8 +15,6 @@ import at.buchberger.bmuc.game.player.ki.CBraham;
 
 public class BmuCGUI {
 
-
-	
 	private static void createAndShowGUI() throws IOException {
 
 		BmucGuiController controller = new BmucGuiController();
@@ -43,7 +41,8 @@ public class BmuCGUI {
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		controller.startGame(new Human(),new CBraham() );
+		// controller.startGame(new Human(), new CBraham());
+		controller.startGame(new CBraham(), new Human());
 		// controller.playGame(new CBraham(), new BBraham());
 
 	}

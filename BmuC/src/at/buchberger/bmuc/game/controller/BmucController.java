@@ -32,7 +32,6 @@ public class BmucController {
 
 			// Board temp1 = currentState;
 
-			currentState.truncatePaths();
 			currentState = nextMove;
 			currentState.printBoardToConsole();
 			System.out.println(
