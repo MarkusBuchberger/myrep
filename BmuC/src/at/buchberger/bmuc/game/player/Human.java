@@ -11,7 +11,6 @@ public class Human implements Player, GUIInputListener {
 
 	@Override
 	public Board choseMove(Board board) {
-
 		synchronized (lock) {
 			try {
 				System.out.println("waiting for player move");
@@ -20,9 +19,6 @@ public class Human implements Player, GUIInputListener {
 				e.printStackTrace();
 			}
 		}
-
-		System.out.println("commencing");
-
 		Board temp = nextMove;
 		nextMove = null;
 		return temp;
@@ -36,11 +32,8 @@ public class Human implements Player, GUIInputListener {
 	@Override
 	public void moveChosen(Board chosenMove) {
 		nextMove = chosenMove;
-		
 		synchronized (lock) {
 			lock.notify();
 		}
-		
 	}
-
 }

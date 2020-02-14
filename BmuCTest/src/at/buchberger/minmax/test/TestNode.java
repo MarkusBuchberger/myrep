@@ -61,5 +61,10 @@ public class TestNode extends GameState<TestNode> {
 	public TestNode getPreviousState() {
 		return null;
 	}
+	
+	@Override
+	public boolean isKillerMove(TestNode killerMove) {
+		return killerMove.value == value;
+	}
 
 }

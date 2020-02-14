@@ -48,39 +48,25 @@ public class BmucGuiController extends MouseAdapter {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		super.mousePressed(e);
-
 		currentPressedFieldX = calcField(e.getY(), false);
 		currentPressedFieldY = calcField(e.getX(), true);
-
-		System.out.println("pressed " + e.getX() + " " + e.getY());
-		System.out.println("pressed " + e.getSource());
-
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		super.mouseReleased(e);
-		System.out.println("released " + e.getX() + " " + e.getY());
-		System.out.println("released " + e.getSource());
-
 		int releasedFieldX = calcField(e.getY(), false);
 		int releasedFieldY = calcField(e.getX(), true);
 
 		if (currentPressedFieldX != -1 && currentPressedFieldY != -1 && releasedFieldX != -1 && releasedFieldY != -1) {
 			Board chosenMove = null;
-			System.out.println("try move: " + currentPressedFieldX + "," + currentPressedFieldY + " -> "
-					+ releasedFieldX + "," + releasedFieldY);
 			for (Board nextMove : currentBoard.getMoves(currentPressedFieldX, currentPressedFieldY)) {
 				// TODO: Multiple moves possible in case of promotion!!! let player chose or
 				// take queen?
-
-				System.out.println("possible move: " + nextMove.getLastMoveX() + "," + nextMove.getLastMoveY());
 				if (nextMove.getLastMoveX() == releasedFieldX && nextMove.getLastMoveY() == releasedFieldY)
 					chosenMove = nextMove;
 			}
 
-			if (chosenMove != null)
-				System.out.println("chosen");
 			if (chosenMove != null)
 				for (GUIInputListener listener : guiInputListeners)
 					listener.moveChosen(chosenMove);

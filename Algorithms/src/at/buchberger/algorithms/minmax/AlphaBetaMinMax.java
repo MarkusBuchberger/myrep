@@ -1,19 +1,19 @@
 package at.buchberger.algorithms.minmax;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 public class AlphaBetaMinMax<T extends GameState<T>> {
 
 	private Heuristic<T> heuristic;
-	private Heuristic<T> preSortHeuristic;
 	private boolean useAlphaBetaPruning;
 	private int minimumDepth;
 	private boolean expandUncalmStates;
+	private Heuristic<T> preSortHeuristic;
 	private boolean useKillerHeuristic;
-
-	private Comparator<T> preSortComparator;
 
 	public AlphaBetaMinMax(Heuristic<T> heuristic, int minimumDepth, boolean useAlphaBetaPruning,
 			Heuristic<T> preSortHeuristic, boolean expandUncalmStates, boolean useKillerHeuristic) {
@@ -26,30 +26,37 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 		this.useKillerHeuristic = useKillerHeuristic;
 	}
 
-	private int moves = 0;
+	private long moves = 0;
 	private int maxDepth = 0;
+	private Comparator<T> preSortComparator;
+
+	private HashMap<Integer, T> killerMoves;
 
 	public T chooseMove(T state) {
+		Calendar start = Calendar.getInstance();
 		heuristic.setInitialState(state);
+		killerMoves = new HashMap<Integer, T>();
 		moves = 0;
 		maxDepth = 0;
 		if (preSortHeuristic != null) {
 			preSortHeuristic.setInitialState(state);
+		}
+
+		if (preSortHeuristic != null) {
 			preSortComparator = new Comparator<T>() {
 				@Override
 				public int compare(T o1, T o2) {
-					return o1.getPreSort() - o2.getPreSort();
+					return o1.getPreSortValue() - o2.getPreSortValue();
 				}
 			};
 		}
 
 		T chosenState = buildMinMaxTree(state, minimumDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
 
-		System.out.println(moves + " moves to calculate");
-		System.out.println(Math.abs(maxDepth - minimumDepth) + " max depth");
-
-		System.out.println("\nbest result:  " + chosenState.getMinMax());
-
+		long millis = Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis();
+		System.out.println("MinMax calculated moves: " + moves + " ("
+				+ (millis > 0 ? ((moves * 1000 / millis) + " m/s") : "") + ", maxdepth: "
+				+ Math.abs(maxDepth - minimumDepth) + ", res: " + chosenState.getMinMax() + ")");
 		return chosenState;
 
 	}
@@ -71,13 +78,29 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 									.getCalmnessThreshold();
 			if (expand) {
 				List<T> children = state.getFollowingStates();
-				if (preSortHeuristic != null && preSortComparator != null && depth > 0) {
+
+				if (preSortHeuristic != null && depth > 0) {
 					for (T child : children) {
-						child.setPreSort(preSortHeuristic.evaluateGameState(child, 1));
+						child.setPreSortValue(preSortHeuristic.evaluateGameState(child, 1));
 					}
 					Collections.sort(children, preSortComparator);
 					if (maxPlayer)
 						Collections.reverse(children);
+				}
+
+				if (useKillerHeuristic) {
+					T killer = killerMoves.get(Integer.valueOf(depth));
+					T found = null;
+					if (killer != null) {
+						for (T child : children) {
+							if (child.isKillerMove(killer))
+								found = child;
+						}
+					}
+					if(found != null) {
+						children.remove(children.indexOf(found));
+						children.add(0, found);
+					}
 				}
 
 				if (maxPlayer) {
@@ -90,6 +113,8 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 						}
 						alpha = Math.max(alpha, maxValue);
 						if (useAlphaBetaPruning && beta <= alpha) {
+							if (useKillerHeuristic)
+								killerMoves.put(Integer.valueOf(depth), child);
 							break; // beta cut
 						}
 					}
@@ -106,6 +131,8 @@ public class AlphaBetaMinMax<T extends GameState<T>> {
 
 						beta = Math.min(beta, minValue);
 						if (useAlphaBetaPruning && beta < alpha) {
+							if (useKillerHeuristic)
+								killerMoves.put(Integer.valueOf(depth), child);
 							break; // alpha cut
 						}
 					}

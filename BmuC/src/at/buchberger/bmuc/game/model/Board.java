@@ -349,7 +349,6 @@ public class Board extends GameState<Board> {
 		this.finalHashCode = finalHashCode;
 	}
 
-
 	@Override
 	public boolean isFinalMove() {
 		return finalBoardState != null;
@@ -374,5 +373,11 @@ public class Board extends GameState<Board> {
 
 	public void setLastMoveY(int lastMoveY) {
 		this.lastMoveY = lastMoveY;
+	}
+
+	@Override
+	public boolean isKillerMove(Board killerMove) {
+		return killerMove.lastMoveX == lastMoveX && killerMove.lastMoveY == lastMoveY
+				&& killerMove.lastMoved == lastMoved;
 	}
 }

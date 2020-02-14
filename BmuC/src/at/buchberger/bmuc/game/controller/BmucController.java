@@ -34,8 +34,7 @@ public class BmucController {
 
 			currentState = nextMove;
 			currentState.printBoardToConsole();
-			System.out.println(
-					"elapsed time: " + (Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis()) + " ms");
+			System.out.println(	"elapsed time: " + (Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis()) + " ms");
 
 			if (comparePlayer2 != null && activePlayer == player2) {
 				System.out.println("COMPARE");

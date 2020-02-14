@@ -1,6 +1,5 @@
 package at.buchberger.bmuc.game.gui.controller;
 
-import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.SwingWorker;
@@ -32,15 +31,10 @@ public class BmucSwingGameWorker extends SwingWorker<Board, Board> {
 		while (currentBoard.getFinalBoardState() == null && !currentBoard.getFollowingStates(true).isEmpty()) {
 			System.out
 					.println("\n turn " + turn + " " + (activePlayer == player1 ? "White:" : "Black"));
-
-			Calendar start = Calendar.getInstance();
 			Board nextMove = activePlayer.choseMove(currentBoard);
 			nextMove.internalEvaluation();
 
 			currentBoard = nextMove;
-			currentBoard.printBoardToConsole();
-			System.out.println(
-					"elapsed time: " + (Calendar.getInstance().getTimeInMillis() - start.getTimeInMillis()) + " ms");
 			publish(currentBoard);
 			activePlayer = activePlayer == player1 ? player2 : player1;
 			if (activePlayer == player1)

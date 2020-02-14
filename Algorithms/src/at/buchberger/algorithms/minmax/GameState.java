@@ -5,7 +5,6 @@ import java.util.List;
 public abstract class GameState<T> {
 	
 	private int minMax;
-	
 	private int preSort;
 	
 	
@@ -18,6 +17,8 @@ public abstract class GameState<T> {
 	public abstract boolean isFinalMove();
 	
 	public abstract T getPreviousState();
+	
+	public abstract boolean isKillerMove(T killerMove);
 	
 	public String getName() {
 		return null;
@@ -32,12 +33,12 @@ public abstract class GameState<T> {
 	}
 
 
-	public int getPreSort() {
+	public int getPreSortValue() {
 		return preSort;
 	}
 
-	public void setPreSort(int preSort) {
-		this.preSort = preSort;
+	public void setPreSortValue(int preSortValue) {
+		this.preSort = preSortValue;
 	}
 	
 	
