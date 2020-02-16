@@ -6,6 +6,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/Algorithms"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/AlgorithmsPureJava"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
